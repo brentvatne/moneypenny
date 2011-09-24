@@ -38,20 +38,23 @@ module Moneypenny
           end
 
           def issue_response(user = config['user'], repo = config['repo'])
-            repository = get_remote_repository(user, repo)
-            repo_path = "#{user}/#{repo}"
-            return "I was unable to find any issues in #{repo_path}, sir!" if repository.open_issues < 1
-
-            #todo: if open issues greater than X, only show first X
-            #-- it seems to crash on large numbers
-            
-            issues = repository.issues.map do |issue|
-              " * ##{issue.number}: #{issue.title} - #{issue_url(user, repo, issue.number)}"
+            begin
+              repository = get_remote_repository(user, repo)
+              repo_path = "#{user}/#{repo}"
+              return "I was unable to find any open issues in #{repo_path}, sir!" if repository.open_issues < 1
+            rescue Octopi::NotFound
+              return "Sir, #{repo_path} does not exist or is private."
             end
-            return "#{issues.length} issue#{"s" if issues.length > 1} found, sir:\n" + issues.join("\n")
 
-          rescue Octopi::NotFound
-            return "Sir, #{repo_path} does not exist or is private."
+            tries = 0
+            begin
+              tries += 1
+              issues = repository.issues.map { |issue| " * ##{issue.number}: #{issue.title} - #{issue_url(user, repo, issue.number)}" }
+              return "#{issues.length} issue#{"s" if issues.length > 1} found, sir:\n" + issues.join("\n")
+            rescue HTTP::Parser::Error
+              retry if tries < 3
+              return "Sir, I had difficulty establishing a solid connectiong with Github. This sometimes happens when the repository is too large, I'm sorry."
+            end
           end
       end
     end
