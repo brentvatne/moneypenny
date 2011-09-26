@@ -5,6 +5,7 @@ gem 'nokogiri'
 gem 'json'
 gem 'twss'
 gem 'octopi'
+gem 'rubyosa19'
 
 group :development do
   gem 'jeweler'

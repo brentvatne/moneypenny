@@ -23,6 +23,7 @@ require 'moneypenny/plugins/responders/help'
 require 'moneypenny/plugins/responders/define'
 require 'moneypenny/plugins/responders/version'
 require 'moneypenny/plugins/responders/issues'
+require 'moneypenny/plugins/responders/tunes'
 
 #listeners
 require 'moneypenny/plugins/listeners/thats_what_she_said'
